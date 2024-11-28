@@ -1,0 +1,16 @@
+let DeviceNames = datatable(DeviceName: string) [
+    "hostname1", "hostname2", "hostname3", 
+    "hostname4", "hostname5", "hostname6"
+];
+
+DeviceLogonEvents
+| where DeviceName in (datatable(DeviceName: string) [
+    "hostname1", "hostname2", "hostname3", 
+    "hostname4", "hostname5", "hostname6"
+])
+| summarize LastLogon=max(Timestamp) by DeviceName, AccountName
+| join kind=inner (
+    DeviceInfo
+    | project DeviceName, OnboardingStatus, OSPlatform, OSVersion, SensorHealthState
+) on DeviceName
+| project DeviceName, AccountName, LastLogon, OnboardingStatus, OSPlatform, OSVersion, SensorHealthState
