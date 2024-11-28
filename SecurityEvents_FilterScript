@@ -1,0 +1,4 @@
+// Filtrando eventos específicos de segurança
+DeviceEvents
+| where DeviceName == 'DeviceName' // Certifica-se de que o nome do dispositivo não está vazio
+| where ActionType in ('AntivirusDetection', 'AntivirusMalwareBlocked', 'FirewallInboundConnectionBlocked', 'FirewallOutboundConnectionBlocked') // Seleciona os tipos de ações de segurança
