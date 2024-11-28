@@ -1,0 +1,3 @@
+DeviceInfo
+| where isnotempty(OSPlatform) // Filtra dispositivos onde a plataforma do sistema operacional não é vazia
+| summarize arg_max(Timestamp, *) by DeviceId // Agrupa por DeviceId e obtém o registro mais recente com base no Timestamp
