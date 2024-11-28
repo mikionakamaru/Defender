@@ -1,0 +1,20 @@
+// Define descrições para os modos de antivírus
+let AvModeDescription = dynamic({"0":"Normal", "1":"Passive", "4":"EDR Block"});
+
+// Define descrições para os anéis de versão
+let RingDescription = dynamic({ "2":"Beta", "3":"Preview", "4":"Staged", "5":"Default-Manual", "6":"Critical: Time Delay"});
+
+// Consulta a tabela DeviceTvmInfoGathering
+DeviceTvmInfoGathering
+| extend AdditionalFields = parse_json(AdditionalFields) // Analisa o campo JSON AdditionalFields
+| extend AvEngineVersion = tostring(AdditionalFields.["AvEngineVersion"]) // Extrai a versão do motor de antivírus
+| extend AvPlatformVersion = tostring(AdditionalFields.["AvPlatformVersion"]) // Extrai a versão da plataforma de antivírus
+| extend AvMode =  tostring(AvModeDescription[tostring(AdditionalFields.["AvMode"])]) // Mapeia o modo de antivírus para a descrição correspondente
+| where isnotempty(AvMode) // Filtra apenas registros com modo de antivírus não vazio
+| extend AvEngineRing = tostring(RingDescription[tostring(AdditionalFields.["AvEngineRing"])]) // Mapeia o anel do motor de antivírus para a descrição correspondente
+| extend AvEngineRing = iff(isempty(AvEngineRing), "Default", AvEngineRing) // Define o anel padrão se estiver vazio
+| extend AvSignatureRing = tostring(RingDescription[tostring(AdditionalFields.["AvSignatureRing"])]) // Mapeia o anel de assinatura de antivírus para a descrição correspondente
+| extend AvSignatureRing = iff(isempty(AvSignatureRing), "Default", AvSignatureRing) // Define o anel padrão se estiver vazio
+| extend AvPlatformRing = tostring(RingDescription[tostring(AdditionalFields.["AvPlatformRing"])]) // Mapeia o anel da plataforma de antivírus para a descrição correspondente
+| extend AvPlatformRing = iff(isempty(AvPlatformRing), "Default", AvPlatformRing) // Define o anel padrão se estiver vazio
+| project-away AdditionalFields, Timestamp, LastSeenTime, DeviceId // Remove colunas desnecessárias do resultado final
