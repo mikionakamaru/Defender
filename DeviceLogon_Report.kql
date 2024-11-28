@@ -1,0 +1,14 @@
+// Este script gera um relatório de logons de dispositivos, incluindo informações de segurança e do sistema operacional.
+
+// Tabela de eventos de logon dos dispositivos
+DeviceLogonEvents
+// Filtra eventos de logon para o dispositivo específico e agrupa pelo nome do dispositivo e da conta do usuário, obtendo o último logon
+| summarize LastLogon=max(Timestamp) by DeviceName, AccountName
+// Junta com a tabela DeviceInfo para obter informações adicionais dos dispositivos
+| join kind=inner (
+    DeviceInfo
+    // Seleciona as colunas de interesse da tabela DeviceInfo
+    | project DeviceName, OnboardingStatus, OSPlatform, OSVersion, SensorHealthState
+) on DeviceName
+// Seleciona as colunas finais do relatório
+| project DeviceName, AccountName, LastLogon, OnboardingStatus, SensorHealthState, OSPlatform, OSVersion
