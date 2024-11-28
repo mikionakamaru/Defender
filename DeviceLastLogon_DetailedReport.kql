@@ -1,0 +1,9 @@
+DeviceLogonEvents
+| where DeviceName == 'HOSTNAME' // Filtra para o dispositivo específico
+| summarize LastLogon=max(Timestamp) by DeviceName, AccountName // Agrupa pelo nome do dispositivo e da conta do usuário, obtendo o último logon
+| top 1 by LastLogon desc // Ordena os resultados por LastLogon em ordem decrescente e pega apenas o mais recente
+| join kind=inner (
+    DeviceInfo
+    | project DeviceName, OnboardingStatus, OSPlatform, OSVersion, SensorHealthState // Seleciona as colunas de interesse
+) on DeviceName
+| project DeviceName, AccountName, LastLogon, OnboardingStatus, OSPlatform, OSVersion, SensorHealthState // Seleciona as colunas finais para o relatório
